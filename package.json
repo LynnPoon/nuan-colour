@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "build:css": "tailwindcss -i ./src/styles.css -o ./public/styles.css"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
