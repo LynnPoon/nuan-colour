@@ -1,0 +1,19 @@
+{
+  "name": "nuan_colour",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "nodemailer": "^6.10.0",
+    "nodemon": "^3.1.10",
+    "tailwindcss": "^4.1.0",
+    "tailwindcss-motion": "^1.1.0"
+  }
+}

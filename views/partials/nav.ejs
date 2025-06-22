@@ -1,0 +1,158 @@
+<nav class="backdrop-blur-md bg-black/40 sticky top-0 z-50 w-full shadow-lg">
+  <div class="max-w-6xl mx-auto px-4 md:px-8">
+    <div class="flex justify-between items-center h-20">
+      <!-- Logo (always with text) -->
+      <a href="/" class="flex items-center gap-2">
+        <img
+          src="/images/logo.png"
+          alt="logo"
+          class="w-12 h-12 md:w-16 md:h-16 rounded-full inline-block"
+        />
+        <span class="font-extrabold text-2xl text-white tracking-widest"
+          >Nu'an Colour</span
+        >
+      </a>
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a
+          href="/"
+          class="nav_link text-white hover:text-pink-300 transition afacad-flux"
+          >Home</a
+        >
+        <a
+          href="/contact-us"
+          class="nav_link text-white hover:text-pink-300 transition afacad-flux"
+          >Contact Us</a
+        >
+        <a
+          href="https://www.instagram.com/nuan.colour/"
+          target="_blank"
+          class="text-white hover:text-pink-600 transition"
+        >
+          <i class="fa-brands fa-instagram text-xl"></i>
+        </a>
+      </div>
+      <!-- Mobile Hamburger -->
+      <div class="md:hidden flex items-center">
+        <button
+          id="mobile-menu-btn"
+          class="relative w-10 h-10 flex flex-col items-center justify-center group focus:outline-none z-[100]"
+          aria-label="Toggle menu"
+          type="button"
+        >
+          <span
+            class="block absolute h-0.5 w-7 bg-white rounded transition-all duration-300 ease-in-out top-3 left-1.5"
+          ></span>
+          <span
+            class="block absolute h-0.5 w-7 bg-white rounded transition-all duration-300 ease-in-out top-5 left-1.5"
+          ></span>
+          <span
+            class="block absolute h-0.5 w-7 bg-white rounded transition-all duration-300 ease-in-out top-7 left-1.5"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Mobile Menu Overlay -->
+  <div
+    id="mobile-menu"
+    class="md:hidden fixed inset-0 w-screen h-screen bg-black z-50 flex flex-col items-center justify-center gap-10 opacity-0 pointer-events-none transition-opacity duration-500"
+  >
+    <div
+      id="mobile-menu-bg"
+      class="absolute inset-0 w-full h-full cursor-pointer"
+    ></div>
+    <div class="relative z-10 flex flex-col items-center gap-10">
+      <a href="/" class="text-white text-3xl afacad-flux" id="nav-home">Home</a>
+      <a
+        href="/contact-us"
+        class="text-white text-3xl afacad-flux"
+        id="nav-contact"
+        >Contact Us</a
+      >
+      <a
+        href="https://www.instagram.com/nuan.colour/"
+        target="_blank"
+        class="text-white text-3xl"
+        id="nav-ig"
+        ><i class="fa-brands fa-instagram"></i
+      ></a>
+    </div>
+  </div>
+  <style>
+    #mobile-menu-btn span {
+      left: 0.375rem;
+      background: #fff;
+      z-index: 101;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #mobile-menu-btn span:nth-child(1) {
+      top: 0.75rem;
+    }
+    #mobile-menu-btn span:nth-child(2) {
+      top: 1.25rem;
+    }
+    #mobile-menu-btn span:nth-child(3) {
+      top: 1.75rem;
+    }
+    #mobile-menu-btn.open span:nth-child(1),
+    #mobile-menu-btn.open span:nth-child(3) {
+      top: 1.25rem;
+    }
+    #mobile-menu-btn.open span:nth-child(1) {
+      transform: rotate(45deg);
+    }
+    #mobile-menu-btn.open span:nth-child(2) {
+      opacity: 0;
+    }
+    #mobile-menu-btn.open span:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+  </style>
+  <script>
+    const menuBtn = document.getElementById("mobile-menu-btn");
+    const menu = document.getElementById("mobile-menu");
+    const menuBg = document.getElementById("mobile-menu-bg");
+    const navHome = document.getElementById("nav-home");
+    const navContact = document.getElementById("nav-contact");
+    const navIg = document.getElementById("nav-ig");
+    // Highlight selected nav item on page load
+    const path = window.location.pathname;
+    if (path === "/") navHome.classList.add("nav_link", "text-pink-300");
+    else if (path.startsWith("/contact"))
+      navContact.classList.add("nav_link", "text-pink-300");
+    // Mobile menu nav highlight on click
+    [navHome, navContact, navIg].forEach((link) =>
+      link.addEventListener("click", function () {
+        if (!menu.classList.contains("opacity-100")) return;
+        navHome.className = "text-white text-3xl afacad-flux";
+        navContact.className = "text-white text-3xl afacad-flux";
+        navIg.className = "text-white text-3xl";
+        if (this === navHome) this.classList.add("nav_link", "text-pink-300");
+        else if (this === navContact)
+          this.classList.add("nav_link", "text-pink-300");
+        else if (this === navIg) this.classList.add("text-pink-600");
+        setTimeout(closeMobileMenu, 120);
+      })
+    );
+    function openMobileMenu() {
+      menu.classList.remove("pointer-events-none", "opacity-0");
+      menu.classList.add("opacity-100");
+      menuBtn.classList.add("open");
+    }
+    function closeMobileMenu() {
+      menu.classList.remove("opacity-100");
+      menu.classList.add("opacity-0");
+      setTimeout(() => menu.classList.add("pointer-events-none"), 500);
+      menuBtn.classList.remove("open");
+    }
+    menuBtn &&
+      menuBtn.addEventListener("click", () =>
+        menu.classList.contains("opacity-100")
+          ? closeMobileMenu()
+          : openMobileMenu()
+      );
+    menuBg && menuBg.addEventListener("click", closeMobileMenu);
+    menu.classList.add("opacity-0", "pointer-events-none");
+  </script>
+</nav>
