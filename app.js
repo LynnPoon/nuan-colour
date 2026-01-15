@@ -1,19 +1,24 @@
-require("dotenv").config(); // Load environment variables
+// Load environment variables
+require("dotenv").config();
 const express = require("express");
+
 // For form validation
 const { check, validationResult } = require("express-validator");
+
 // For sending emails
 const SibApiV3Sdk = require("sib-api-v3-sdk");
 const client = new SibApiV3Sdk.TransactionalEmailsApi();
+
+const axios = require("axios");
 
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications["api-key"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
 
-// express app
+// Express app
 const app = express();
 
-// register view engine
+// Register view engine
 app.set("view engine", "ejs");
 
 // Serve static files (for CSS/JS)
@@ -21,10 +26,10 @@ app.use(express.static("public"));
 
 app.use(express.urlencoded({ extended: true }));
 
-// listen for requests
+// Listen for requests
 app.listen(3000);
 
-// an array of middleware functions
+// An array of middleware functions
 const validateForm = [
   check("first_name")
     .trim()
@@ -55,31 +60,65 @@ const validateForm = [
     .withMessage("Message is required"),
 ];
 
-// respond to requests
+// Respond to requests
 app.get("/", (req, res) => {
   res.render("index", { title: "Home" });
 });
 
 app.get("/contact-us", (req, res) => {
-  //res.render('contact', {title: 'Contact Us'});
   res.render("contact", {
     title: "Contact Us",
     errors: {}, // Ensure errors exist
     formData: {}, // Ensure formData exists
     successMessage: null,
+    recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
   });
 });
 
 app.post("/contact-us", validateForm, async (req, res) => {
   // Check for validation errors
   const errors = validationResult(req);
+  const formErrors = errors.isEmpty() ? {} : errors.mapped();
 
-  if (!errors.isEmpty()) {
+  // ✅ Verify reCAPTCHA v3
+  const recaptchaToken = req.body.recaptcha_token;
+
+  if (!recaptchaToken) {
+    formErrors.recaptcha = { msg: "reCAPTCHA verification failed" };
+  } else {
+    try {
+      const verificationURL = "https://www.google.com/recaptcha/api/siteverify";
+
+      const response = await axios.post(verificationURL, null, {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+        },
+      });
+
+      const { success, score } = response.data;
+
+      console.log("reCAPTCHA score:", score);
+
+      if (!success || score < 0.5) {
+        formErrors.recaptcha = {
+          msg: "Suspicious activity detected. Please try again.",
+        };
+      }
+    } catch (error) {
+      console.error("reCAPTCHA verification error:", error);
+      formErrors.recaptcha = { msg: "reCAPTCHA verification failed" };
+    }
+  }
+
+  // If there are any errors, return early
+  if (Object.keys(formErrors).length > 0) {
     return res.status(400).render("contact", {
       title: "Contact Us",
-      errors: errors.mapped(), // Convert errors into an object for easy access
-      formData: req.body, // Pass back the user's input
+      errors: formErrors,
+      formData: req.body,
       successMessage: null,
+      recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
     });
   }
 
@@ -127,6 +166,7 @@ app.post("/contact-us", validateForm, async (req, res) => {
       successMessage: null,
       errors: { email: { msg: "Failed to send email. Try again later." } },
       formData: req.body,
+      recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
     });
   }
 
@@ -176,6 +216,7 @@ app.post("/contact-us", validateForm, async (req, res) => {
     successMessage: "Form submitted successfully!",
     errors: {},
     formData: {}, // Clear form after success
+    recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
   });
 });
 
